@@ -10,10 +10,10 @@ app.use(express.json());
 
 // Should be in the ENV
 let port = 3000;
-const googleTokenServerUrl = 'https://www.googleapis.com/oauth2/v4/token';
-const googlePlusAPI = 'https://www.googleapis.com/plus/v1/people/me/openIdConnect';
-const GOOGLE_CLIENT_ID = '560654039720-thgq1sm2bu3j3ce0indjlg91q3p3ps3b.apps.googleusercontent.com';
-const GOOGLE_CLIENT_SECRET = 'RC3khc0IhdNTzeUa76eSGIBe';
+const githubTokenServerUrl = 'https://github.com/login/oauth/access_token';
+const githubAPI = 'https://api.github.com/user';
+const GITHUB_CLIENT_ID = '60f5bfe00cd3af9fc8c7';
+const GITHUB_CLIENT_SECRET = 'a28d864b353bdfb752e18b685ef873fd39e3cea9';
 const API_SERVER = 'http://localhost:3000/oauth';
 
 // Routes
@@ -24,12 +24,11 @@ function authorize (req,res) {
   let code = req.query.code;
   console.log('(1) CODE:', code);
 
-  return superagent.post(googleTokenServerUrl)
-    .type('form')
+  return superagent.post(githubTokenServerUrl)
     .send({
       code: code,
-      client_id: GOOGLE_CLIENT_ID,
-      client_secret: GOOGLE_CLIENT_SECRET,
+      client_id: GITHUB_CLIENT_ID,
+      client_secret: GITHUB_CLIENT_SECRET,
       redirect_uri: API_SERVER,
       grant_type: 'authorization_code',
     })
@@ -39,7 +38,7 @@ function authorize (req,res) {
       return access_token;
     })
     .then(token => {
-      return superagent.get(googlePlusAPI)
+      return superagent.get(githubAPI)
         .set('Authorization', `Bearer ${token}`)
         .then(response => {
           let user = response.body;
